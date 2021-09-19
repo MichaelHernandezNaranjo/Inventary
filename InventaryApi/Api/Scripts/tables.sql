@@ -1,601 +1,604 @@
-USE [STORE_00]
-GO
-/****** Object:  Table [dbo].[authorization]    Script Date: 17/09/2021 8:43:18 p. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[authorization](
-	[userName] [varchar](100) NOT NULL,
-	[password] [varchar](100) NOT NULL
-) ON [PRIMARY]
+USE STORE_00
+go
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[branch]    Script Date: 17/09/2021 8:43:18 p. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[branch](
-	[branchId] [int] IDENTITY(1,1) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[cityId] [int] NULL,
-	[address] [varchar](120) NULL,
-	[email] [varchar](30) NULL,
-	[phone1] [varchar](40) NULL,
-	[phone2] [varchar](40) NULL,
-	[createDate] [datetime] NOT NULL,
-	[active] [bit] NOT NULL,
- CONSTRAINT [pk_branch] PRIMARY KEY CLUSTERED 
+create table [authorization](
+	userName varchar(120) not null,
+	password varchar(120) not null,
+	description varchar(120) null,
+	createDate datetime not null,
+	active bit not null,
+	constraint pk_authorization primary key clustered (userName asc)
+)
+go
+
+create table [country] (
+	countryId int identity(1,1) not null,
+	name varchar(120) not null unique,
+	createDate datetime not null,
+	active bit not null,
+	constraint pk_country primary key clustered (countryId asc)
+)
+go
+
+create table [department] (
+	departmentId int identity(1,1) not null,
+	name varchar(120) not null,
+	countryId int not null,
+	createDate datetime not null,
+	active bit not null,
+	constraint pk_department primary key clustered (departmentId asc),
+	constraint fk_department_country foreign key (countryId) references country (countryId)
+)
+go
+
+create table [city] (
+	cityId int identity(1,1) not null,
+	name varchar(120) not null,
+	departmentId int not null,
+	createDate datetime not null,
+	active bit not null,
+	constraint pk_city primary key clustered (cityId asc),
+	constraint fk_city_department foreign key (departmentId) references department (departmentId)
+)
+go
+
+create table [branch](
+	branchId int identity(1,1) not null,
+	name varchar(120) not null unique,
+	cityId int null,
+	address varchar(120) null,
+	email varchar(30) null,
+	phone1 varchar(40) null,
+	phone2 varchar(40) null,
+	createDate datetime not null,
+	active bit not null,
+	constraint pk_branch primary key clustered (branchId asc),
+	constraint fk_branch_city foreign key (cityId) references city (cityId)
+)
+go
+
+create table [settingType] (
+	settingTypeId int not null identity(1,1) not null,
+	name varchar(120) not null unique,
+	constraint pk_settingType primary key clustered (settingTypeId asc)
+)
+go
+
+create table [setting] (
+	settingId int not null identity(1,1) not null,
+	constant varchar(40) not null unique,
+	settingTypeId int not null,
+	branchId int null,
+	description varchar(120) null,
+	value varchar(max) not null,
+	constraint pk_setting primary key clustered ( settingId asc),
+	constraint fk_setting_settingType foreign key (settingTypeId) references settingType (settingTypeId),
+	constraint fk_setting_branch foreign key (branchId) references branch (branchId)
+)
+go
+
+create table businessPartner(
+	businessPartnerId int identity(1,1) not null,
+	type varchar(1) not null,
+	name varchar(120) not null,
+	identificationNumber varchar(40) null,
+	typeIdentificationId varchar(3) null,
+	cityId int null,
+	address varchar(120) null,
+	email varchar(30) null,
+	phone1 varchar(40) null,
+	phone2 varchar(40) null,
+	createDate datetime not null,
+	active bit not null,
+ constraint pk_businessPartner primary key clustered 
 (
-	[branchId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	businessPartnerId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[businessPartner]    Script Date: 17/09/2021 8:43:18 p. m. ******/
+go
+
+go
+/****** Object:  Table category    Script Date: 17/09/2021 8:43:18 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[businessPartner](
-	[businessPartnerId] [int] IDENTITY(1,1) NOT NULL,
-	[type] [varchar](1) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[identificationNumber] [varchar](40) NULL,
-	[typeIdentificationId] [varchar](3) NULL,
-	[cityId] [int] NULL,
-	[address] [varchar](120) NULL,
-	[email] [varchar](30) NULL,
-	[phone1] [varchar](40) NULL,
-	[phone2] [varchar](40) NULL,
-	[createDate] [datetime] NOT NULL,
-	[active] [bit] NOT NULL,
- CONSTRAINT [pk_businessPartner] PRIMARY KEY CLUSTERED 
+go
+create table category(
+	categoryId int identity(1,1) not null,
+	name varchar(120) not null,
+	createDate datetime not null,
+	active bit not null,
+ constraint pk_category primary key clustered 
 (
-	[businessPartnerId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	categoryId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[category]    Script Date: 17/09/2021 8:43:18 p. m. ******/
+go
+
+go
+/****** Object:  Table city    Script Date: 17/09/2021 8:43:18 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[category](
-	[categoryId] [int] IDENTITY(1,1) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[createDate] [datetime] NOT NULL,
-	[active] [bit] NOT NULL,
- CONSTRAINT [pk_category] PRIMARY KEY CLUSTERED 
-(
-	[categoryId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+go
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[city]    Script Date: 17/09/2021 8:43:18 p. m. ******/
+
+go
+
+go
+/****** Object:  Table country    Script Date: 17/09/2021 8:43:18 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[city](
-	[cityId] [int] IDENTITY(1,1) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[departmentId] [int] NOT NULL,
- CONSTRAINT [pk_city] PRIMARY KEY CLUSTERED 
-(
-	[cityId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+go
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[country]    Script Date: 17/09/2021 8:43:18 p. m. ******/
+
+go
+
+go
+/****** Object:  Table department    Script Date: 17/09/2021 8:43:18 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[country](
-	[countryId] [int] IDENTITY(1,1) NOT NULL,
-	[name] [varchar](120) NOT NULL,
- CONSTRAINT [pk_country] PRIMARY KEY CLUSTERED 
-(
-	[countryId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+go
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[department]    Script Date: 17/09/2021 8:43:18 p. m. ******/
+
+go
+
+go
+/****** Object:  Table invoice    Script Date: 17/09/2021 8:43:18 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[department](
-	[departmentId] [int] IDENTITY(1,1) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[countryId] [int] NOT NULL,
- CONSTRAINT [pk_department] PRIMARY KEY CLUSTERED 
+go
+create table invoice(
+	documentId varchar(40) not null,
+	documentType varchar(3) not null,
+	documentDate date not null,
+	businessPartnerId int not null,
+	businessPartnerType varchar(1) not null,
+	businessPartnerName varchar(120) null,
+	identificationNumber varchar(40) null,
+	typeIdentificationId varchar(3) null,
+	cityId int null,
+	address varchar(120) null,
+	email varchar(30) null,
+	phone1 varchar(40) null,
+	phone2 varchar(40) null,
+	sellerId int null,
+	sellerName varchar(120) null,
+	subTotal decimal(18, 8) null,
+	totalDiscount decimal(18, 8) null,
+	totalTax decimal(18, 8) null,
+	total decimal(18, 8) null,
+	comment varchar(500) null,
+	branchId int not null,
+	createDate datetime not null,
+	active bit not null,
+ constraint pk_invoice primary key clustered 
 (
-	[departmentId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	documentId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[invoice]    Script Date: 17/09/2021 8:43:18 p. m. ******/
+go
+
+go
+/****** Object:  Table invoiceDetail    Script Date: 17/09/2021 8:43:18 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[invoice](
-	[documentId] [varchar](40) NOT NULL,
-	[documentType] [varchar](3) NOT NULL,
-	[documentDate] [date] NOT NULL,
-	[businessPartnerId] [int] NOT NULL,
-	[businessPartnerType] [varchar](1) NOT NULL,
-	[businessPartnerName] [varchar](120) NULL,
-	[identificationNumber] [varchar](40) NULL,
-	[typeIdentificationId] [varchar](3) NULL,
-	[cityId] [int] NULL,
-	[address] [varchar](120) NULL,
-	[email] [varchar](30) NULL,
-	[phone1] [varchar](40) NULL,
-	[phone2] [varchar](40) NULL,
-	[sellerId] [int] NULL,
-	[sellerName] [varchar](120) NULL,
-	[subTotal] [decimal](18, 8) NULL,
-	[totalDiscount] [decimal](18, 8) NULL,
-	[totalTax] [decimal](18, 8) NULL,
-	[total] [decimal](18, 8) NULL,
-	[comment] [varchar](500) NULL,
-	[branchId] [int] NOT NULL,
-	[createDate] [datetime] NOT NULL,
-	[active] [bit] NOT NULL,
- CONSTRAINT [pk_invoice] PRIMARY KEY CLUSTERED 
+go
+create table invoiceDetail(
+	documentId varchar(40) not null,
+	documentLine int not null,
+	itemId varchar(40) not null,
+	itemName varchar(120) null,
+	reference varchar(40) null,
+	inventory bit null,
+	quantity int not null,
+	price decimal(18, 8) not null,
+	discount decimal(18, 8) not null,
+	totalDiscount decimal(18, 8) null,
+	taxId int null,
+	taxName varchar(120) null,
+	tax decimal(18, 8) null,
+	totalTax decimal(18, 8) null,
+	subTotal decimal(18, 8) null,
+	total decimal(18, 8) null,
+	warehouseId int null,
+ constraint pk_invoiceDetail primary key clustered 
 (
-	[documentId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	documentId asc,
+	documentLine asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[invoiceDetail]    Script Date: 17/09/2021 8:43:18 p. m. ******/
+go
+
+go
+/****** Object:  Table item    Script Date: 17/09/2021 8:43:18 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[invoiceDetail](
-	[documentId] [varchar](40) NOT NULL,
-	[documentLine] [int] NOT NULL,
-	[itemId] [varchar](40) NOT NULL,
-	[itemName] [varchar](120) NULL,
-	[reference] [varchar](40) NULL,
-	[inventory] [bit] NULL,
-	[quantity] [int] NOT NULL,
-	[price] [decimal](18, 8) NOT NULL,
-	[discount] [decimal](18, 8) NOT NULL,
-	[totalDiscount] [decimal](18, 8) NULL,
-	[taxId] [int] NULL,
-	[taxName] [varchar](120) NULL,
-	[tax] [decimal](18, 8) NULL,
-	[totalTax] [decimal](18, 8) NULL,
-	[subTotal] [decimal](18, 8) NULL,
-	[total] [decimal](18, 8) NULL,
-	[warehouseId] [int] NULL,
- CONSTRAINT [pk_invoiceDetail] PRIMARY KEY CLUSTERED 
+go
+create table item(
+	itemId varchar(40) not null,
+	name varchar(120) not null,
+	reference varchar(40) null,
+	inventory bit not null,
+	categoryId int null,
+	createDate datetime not null,
+	active bit not null,
+ constraint pk_item primary key clustered 
 (
-	[documentId] ASC,
-	[documentLine] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	itemId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[item]    Script Date: 17/09/2021 8:43:18 p. m. ******/
+go
+
+go
+/****** Object:  Table numeration    Script Date: 17/09/2021 8:43:18 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[item](
-	[itemId] [varchar](40) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[reference] [varchar](40) NULL,
-	[inventory] [bit] NOT NULL,
-	[categoryId] [int] NULL,
-	[createDate] [datetime] NOT NULL,
-	[active] [bit] NOT NULL,
- CONSTRAINT [pk_item] PRIMARY KEY CLUSTERED 
+go
+create table numeration(
+	documentType varchar(3) not null,
+	documentId varchar(40) not null,
+	numerationMin varchar(40) not null,
+	numerationMax varchar(40) not null,
+ constraint pk_numeration primary key clustered 
 (
-	[itemId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	documentType asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[numeration]    Script Date: 17/09/2021 8:43:18 p. m. ******/
+go
+
+go
+/****** Object:  Table priceList    Script Date: 17/09/2021 8:43:19 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[numeration](
-	[documentType] [varchar](3) NOT NULL,
-	[documentId] [varchar](40) NOT NULL,
-	[numerationMin] [varchar](40) NOT NULL,
-	[numerationMax] [varchar](40) NOT NULL,
- CONSTRAINT [pk_numeration] PRIMARY KEY CLUSTERED 
+go
+create table priceList(
+	priceListId int identity(1,1) not null,
+	name varchar(120) not null,
+	createDate datetime not null,
+	active bit not null,
+ constraint pk_priceList primary key clustered 
 (
-	[documentType] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	priceListId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[priceList]    Script Date: 17/09/2021 8:43:19 p. m. ******/
+go
+
+go
+/****** Object:  Table priceList_item    Script Date: 17/09/2021 8:43:19 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[priceList](
-	[priceListId] [int] IDENTITY(1,1) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[createDate] [datetime] NOT NULL,
-	[active] [bit] NOT NULL,
- CONSTRAINT [pk_priceList] PRIMARY KEY CLUSTERED 
+go
+create table priceList_item(
+	priceListId int not null,
+	itemId varchar(40) not null,
+	quantity int not null,
+	price decimal(18, 8) not null,
+	discount decimal(18, 8) not null,
+ constraint pk_priceList_item primary key clustered 
 (
-	[priceListId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	priceListId asc,
+	itemId asc,
+	quantity asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[priceList_item]    Script Date: 17/09/2021 8:43:19 p. m. ******/
+go
+
+go
+/****** Object:  Table roll    Script Date: 17/09/2021 8:43:19 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[priceList_item](
-	[priceListId] [int] NOT NULL,
-	[itemId] [varchar](40) NOT NULL,
-	[quantity] [int] NOT NULL,
-	[price] [decimal](18, 8) NOT NULL,
-	[discount] [decimal](18, 8) NOT NULL,
- CONSTRAINT [pk_priceList_item] PRIMARY KEY CLUSTERED 
+go
+create table roll(
+	rollId int identity(1,1) not null,
+	name varchar(120) not null,
+	createDate datetime not null,
+	active bit not null,
+ constraint pk_roll primary key clustered 
 (
-	[priceListId] ASC,
-	[itemId] ASC,
-	[quantity] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	rollId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[roll]    Script Date: 17/09/2021 8:43:19 p. m. ******/
+go
+
+go
+/****** Object:  Table seller    Script Date: 17/09/2021 8:43:19 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[roll](
-	[rollId] [int] IDENTITY(1,1) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[createDate] [datetime] NOT NULL,
-	[active] [bit] NOT NULL,
- CONSTRAINT [pk_roll] PRIMARY KEY CLUSTERED 
+go
+create table seller(
+	sellerId int identity(1,1) not null,
+	name varchar(120) not null,
+	createDate datetime not null,
+	active bit not null,
+ constraint pk_seller primary key clustered 
 (
-	[rollId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	sellerId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[seller]    Script Date: 17/09/2021 8:43:19 p. m. ******/
+go
+
+go
+/****** Object:  Table tax    Script Date: 17/09/2021 8:43:19 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[seller](
-	[sellerId] [int] IDENTITY(1,1) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[createDate] [datetime] NOT NULL,
-	[active] [bit] NOT NULL,
- CONSTRAINT [pk_seller] PRIMARY KEY CLUSTERED 
+go
+create table tax(
+	taxId int identity(1,1) not null,
+	name varchar(120) not null,
+	percentage decimal(18, 8) not null,
+	createDate datetime not null,
+	active bit not null,
+ constraint pk_tax primary key clustered 
 (
-	[sellerId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	taxId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[tax]    Script Date: 17/09/2021 8:43:19 p. m. ******/
+go
+
+go
+/****** Object:  Table tax_item    Script Date: 17/09/2021 8:43:19 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[tax](
-	[taxId] [int] IDENTITY(1,1) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[percentage] [decimal](18, 8) NOT NULL,
-	[createDate] [datetime] NOT NULL,
-	[active] [bit] NOT NULL,
- CONSTRAINT [pk_tax] PRIMARY KEY CLUSTERED 
+go
+create table tax_item(
+	taxId int not null,
+	itemId varchar(40) not null,
+	type varchar(1) not null,
+ constraint pk_tax_item primary key clustered 
 (
-	[taxId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	taxId asc,
+	itemId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[tax_item]    Script Date: 17/09/2021 8:43:19 p. m. ******/
+go
+
+go
+/****** Object:  Table typeIdentification    Script Date: 17/09/2021 8:43:19 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[tax_item](
-	[taxId] [int] NOT NULL,
-	[itemId] [varchar](40) NOT NULL,
-	[type] [varchar](1) NOT NULL,
- CONSTRAINT [pk_tax_item] PRIMARY KEY CLUSTERED 
+go
+create table typeIdentification(
+	typeIdentificationId varchar(3) not null,
+	name varchar(120) not null,
+	createDate datetime not null,
+	active bit not null,
+ constraint pk_typeIdentification primary key clustered 
 (
-	[taxId] ASC,
-	[itemId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	typeIdentificationId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[typeIdentification]    Script Date: 17/09/2021 8:43:19 p. m. ******/
+go
+
+go
+/****** Object:  Table user    Script Date: 17/09/2021 8:43:19 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[typeIdentification](
-	[typeIdentificationId] [varchar](3) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[createDate] [datetime] NOT NULL,
-	[active] [bit] NOT NULL,
- CONSTRAINT [pk_typeIdentification] PRIMARY KEY CLUSTERED 
+go
+create table user(
+	userId varchar(40) not null,
+	name varchar(120) not null,
+	email varchar(30) null,
+	password varchar(100) not null,
+	phone varchar(40) null,
+	rollId int null,
+	createDate datetime not null,
+	active bit not null,
+ constraint pk_user primary key clustered 
 (
-	[typeIdentificationId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	userId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[user]    Script Date: 17/09/2021 8:43:19 p. m. ******/
+go
+
+go
+/****** Object:  Table warehouse    Script Date: 17/09/2021 8:43:19 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[user](
-	[userId] [varchar](40) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[email] [varchar](30) NULL,
-	[password] [varchar](100) NOT NULL,
-	[phone] [varchar](40) NULL,
-	[rollId] [int] NULL,
-	[createDate] [datetime] NOT NULL,
-	[active] [bit] NOT NULL,
- CONSTRAINT [pk_user] PRIMARY KEY CLUSTERED 
+go
+create table warehouse(
+	warehouseId int identity(1,1) not null,
+	name varchar(120) not null,
+	branchId int not null,
+	createDate datetime not null,
+	active bit not null,
+ constraint pk_warehouse primary key clustered 
 (
-	[userId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	warehouseId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[warehouse]    Script Date: 17/09/2021 8:43:19 p. m. ******/
+go
+
+go
+/****** Object:  Table warehouse_item    Script Date: 17/09/2021 8:43:19 p. m. ******/
 SET ANSI_NULLS ON
-GO
+go
 SET QUOTED_IDENTIFIER ON
-GO
+go
 SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[warehouse](
-	[warehouseId] [int] IDENTITY(1,1) NOT NULL,
-	[name] [varchar](120) NOT NULL,
-	[branchId] [int] NOT NULL,
-	[createDate] [datetime] NOT NULL,
-	[active] [bit] NOT NULL,
- CONSTRAINT [pk_warehouse] PRIMARY KEY CLUSTERED 
+go
+create table warehouse_item(
+	warehouseId int not null,
+	itemId varchar(40) not null,
+	stock int not null,
+	compromised int not null,
+	available int not null,
+ constraint pk_warehouse_item primary key clustered 
 (
-	[warehouseId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+	warehouseId asc,
+	itemId asc
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON primary
+) ON primary
 
-GO
-SET ANSI_PADDING OFF
-GO
-/****** Object:  Table [dbo].[warehouse_item]    Script Date: 17/09/2021 8:43:19 p. m. ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-SET ANSI_PADDING ON
-GO
-CREATE TABLE [dbo].[warehouse_item](
-	[warehouseId] [int] NOT NULL,
-	[itemId] [varchar](40) NOT NULL,
-	[stock] [int] NOT NULL,
-	[compromised] [int] NOT NULL,
-	[available] [int] NOT NULL,
- CONSTRAINT [pk_warehouse_item] PRIMARY KEY CLUSTERED 
-(
-	[warehouseId] ASC,
-	[itemId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+go
 
-GO
-SET ANSI_PADDING OFF
-GO
-ALTER TABLE [dbo].[branch]  WITH CHECK ADD  CONSTRAINT [fk_branch_city] FOREIGN KEY([cityId])
-REFERENCES [dbo].[city] ([cityId])
-GO
-ALTER TABLE [dbo].[branch] CHECK CONSTRAINT [fk_branch_city]
-GO
-ALTER TABLE [dbo].[businessPartner]  WITH CHECK ADD  CONSTRAINT [fk_businessPartner_city] FOREIGN KEY([cityId])
-REFERENCES [dbo].[city] ([cityId])
-GO
-ALTER TABLE [dbo].[businessPartner] CHECK CONSTRAINT [fk_businessPartner_city]
-GO
-ALTER TABLE [dbo].[businessPartner]  WITH CHECK ADD  CONSTRAINT [fk_businessPartner_typeIdentification] FOREIGN KEY([typeIdentificationId])
-REFERENCES [dbo].[typeIdentification] ([typeIdentificationId])
-GO
-ALTER TABLE [dbo].[businessPartner] CHECK CONSTRAINT [fk_businessPartner_typeIdentification]
-GO
-ALTER TABLE [dbo].[city]  WITH CHECK ADD  CONSTRAINT [fk_city_department] FOREIGN KEY([departmentId])
-REFERENCES [dbo].[department] ([departmentId])
-GO
-ALTER TABLE [dbo].[city] CHECK CONSTRAINT [fk_city_department]
-GO
-ALTER TABLE [dbo].[department]  WITH CHECK ADD  CONSTRAINT [fk_department_country] FOREIGN KEY([countryId])
-REFERENCES [dbo].[country] ([countryId])
-GO
-ALTER TABLE [dbo].[department] CHECK CONSTRAINT [fk_department_country]
-GO
-ALTER TABLE [dbo].[invoice]  WITH CHECK ADD  CONSTRAINT [fk_invoice_branch] FOREIGN KEY([branchId])
-REFERENCES [dbo].[branch] ([branchId])
-GO
-ALTER TABLE [dbo].[invoice] CHECK CONSTRAINT [fk_invoice_branch]
-GO
-ALTER TABLE [dbo].[invoice]  WITH CHECK ADD  CONSTRAINT [fk_invoice_businessPartner] FOREIGN KEY([businessPartnerId])
-REFERENCES [dbo].[businessPartner] ([businessPartnerId])
-GO
-ALTER TABLE [dbo].[invoice] CHECK CONSTRAINT [fk_invoice_businessPartner]
-GO
-ALTER TABLE [dbo].[invoice]  WITH CHECK ADD  CONSTRAINT [fk_invoice_seller] FOREIGN KEY([sellerId])
-REFERENCES [dbo].[seller] ([sellerId])
-GO
-ALTER TABLE [dbo].[invoice] CHECK CONSTRAINT [fk_invoice_seller]
-GO
-ALTER TABLE [dbo].[invoiceDetail]  WITH CHECK ADD  CONSTRAINT [fk_invoiceDetail_invoice] FOREIGN KEY([documentId])
-REFERENCES [dbo].[invoice] ([documentId])
-GO
-ALTER TABLE [dbo].[invoiceDetail] CHECK CONSTRAINT [fk_invoiceDetail_invoice]
-GO
-ALTER TABLE [dbo].[invoiceDetail]  WITH CHECK ADD  CONSTRAINT [fk_invoiceDetail_item] FOREIGN KEY([itemId])
-REFERENCES [dbo].[item] ([itemId])
-GO
-ALTER TABLE [dbo].[invoiceDetail] CHECK CONSTRAINT [fk_invoiceDetail_item]
-GO
-ALTER TABLE [dbo].[invoiceDetail]  WITH CHECK ADD  CONSTRAINT [fk_invoiceDetail_tax] FOREIGN KEY([taxId])
-REFERENCES [dbo].[tax] ([taxId])
-GO
-ALTER TABLE [dbo].[invoiceDetail] CHECK CONSTRAINT [fk_invoiceDetail_tax]
-GO
-ALTER TABLE [dbo].[invoiceDetail]  WITH CHECK ADD  CONSTRAINT [fk_invoiceDetail_warehouse] FOREIGN KEY([warehouseId])
-REFERENCES [dbo].[warehouse] ([warehouseId])
-GO
-ALTER TABLE [dbo].[invoiceDetail] CHECK CONSTRAINT [fk_invoiceDetail_warehouse]
-GO
-ALTER TABLE [dbo].[item]  WITH CHECK ADD  CONSTRAINT [fk_item_category] FOREIGN KEY([categoryId])
-REFERENCES [dbo].[category] ([categoryId])
-GO
-ALTER TABLE [dbo].[item] CHECK CONSTRAINT [fk_item_category]
-GO
-ALTER TABLE [dbo].[priceList_item]  WITH CHECK ADD  CONSTRAINT [fk_priceList_item_item] FOREIGN KEY([itemId])
-REFERENCES [dbo].[item] ([itemId])
-GO
-ALTER TABLE [dbo].[priceList_item] CHECK CONSTRAINT [fk_priceList_item_item]
-GO
-ALTER TABLE [dbo].[priceList_item]  WITH CHECK ADD  CONSTRAINT [fk_priceList_item_priceList] FOREIGN KEY([priceListId])
-REFERENCES [dbo].[priceList] ([priceListId])
-GO
-ALTER TABLE [dbo].[priceList_item] CHECK CONSTRAINT [fk_priceList_item_priceList]
-GO
-ALTER TABLE [dbo].[tax_item]  WITH CHECK ADD  CONSTRAINT [fk_tax_item_item] FOREIGN KEY([itemId])
-REFERENCES [dbo].[item] ([itemId])
-GO
-ALTER TABLE [dbo].[tax_item] CHECK CONSTRAINT [fk_tax_item_item]
-GO
-ALTER TABLE [dbo].[tax_item]  WITH CHECK ADD  CONSTRAINT [fk_tax_item_tax] FOREIGN KEY([taxId])
-REFERENCES [dbo].[tax] ([taxId])
-GO
-ALTER TABLE [dbo].[tax_item] CHECK CONSTRAINT [fk_tax_item_tax]
-GO
-ALTER TABLE [dbo].[user]  WITH CHECK ADD  CONSTRAINT [fk_user_roll] FOREIGN KEY([rollId])
-REFERENCES [dbo].[roll] ([rollId])
-GO
-ALTER TABLE [dbo].[user] CHECK CONSTRAINT [fk_user_roll]
-GO
-ALTER TABLE [dbo].[warehouse]  WITH CHECK ADD  CONSTRAINT [fk_warehouse_branch] FOREIGN KEY([branchId])
-REFERENCES [dbo].[branch] ([branchId])
-GO
-ALTER TABLE [dbo].[warehouse] CHECK CONSTRAINT [fk_warehouse_branch]
-GO
-ALTER TABLE [dbo].[warehouse_item]  WITH CHECK ADD  CONSTRAINT [fk_warehouse_item_item] FOREIGN KEY([itemId])
-REFERENCES [dbo].[item] ([itemId])
-GO
-ALTER TABLE [dbo].[warehouse_item] CHECK CONSTRAINT [fk_warehouse_item_item]
-GO
-ALTER TABLE [dbo].[warehouse_item]  WITH CHECK ADD  CONSTRAINT [fk_warehouse_item_warehouse] FOREIGN KEY([warehouseId])
-REFERENCES [dbo].[warehouse] ([warehouseId])
-GO
-ALTER TABLE [dbo].[warehouse_item] CHECK CONSTRAINT [fk_warehouse_item_warehouse]
-GO
+go
+
+go
+ALTER table branch CHECK constraint fk_branch_city
+go
+ALTER table businessPartner  WITH CHECK ADD  constraint fk_businessPartner_city FOREIGN key(cityId)
+REFERENCES city (cityId)
+go
+ALTER table businessPartner CHECK constraint fk_businessPartner_city
+go
+ALTER table businessPartner  WITH CHECK ADD  constraint fk_businessPartner_typeIdentification FOREIGN key(typeIdentificationId)
+REFERENCES typeIdentification (typeIdentificationId)
+go
+ALTER table businessPartner CHECK constraint fk_businessPartner_typeIdentification
+go
+
+go
+ALTER table city CHECK constraint fk_city_department
+go
+
+go
+ALTER table department CHECK constraint fk_department_country
+go
+ALTER table invoice  WITH CHECK ADD  constraint fk_invoice_branch FOREIGN key(branchId)
+REFERENCES branch (branchId)
+go
+ALTER table invoice CHECK constraint fk_invoice_branch
+go
+ALTER table invoice  WITH CHECK ADD  constraint fk_invoice_businessPartner FOREIGN key(businessPartnerId)
+REFERENCES businessPartner (businessPartnerId)
+go
+ALTER table invoice CHECK constraint fk_invoice_businessPartner
+go
+ALTER table invoice  WITH CHECK ADD  constraint fk_invoice_seller FOREIGN key(sellerId)
+REFERENCES seller (sellerId)
+go
+ALTER table invoice CHECK constraint fk_invoice_seller
+go
+ALTER table invoiceDetail  WITH CHECK ADD  constraint fk_invoiceDetail_invoice FOREIGN key(documentId)
+REFERENCES invoice (documentId)
+go
+ALTER table invoiceDetail CHECK constraint fk_invoiceDetail_invoice
+go
+ALTER table invoiceDetail  WITH CHECK ADD  constraint fk_invoiceDetail_item FOREIGN key(itemId)
+REFERENCES item (itemId)
+go
+ALTER table invoiceDetail CHECK constraint fk_invoiceDetail_item
+go
+ALTER table invoiceDetail  WITH CHECK ADD  constraint fk_invoiceDetail_tax FOREIGN key(taxId)
+REFERENCES tax (taxId)
+go
+ALTER table invoiceDetail CHECK constraint fk_invoiceDetail_tax
+go
+ALTER table invoiceDetail  WITH CHECK ADD  constraint fk_invoiceDetail_warehouse FOREIGN key(warehouseId)
+REFERENCES warehouse (warehouseId)
+go
+ALTER table invoiceDetail CHECK constraint fk_invoiceDetail_warehouse
+go
+ALTER table item  WITH CHECK ADD  constraint fk_item_category FOREIGN key(categoryId)
+REFERENCES category (categoryId)
+go
+ALTER table item CHECK constraint fk_item_category
+go
+ALTER table priceList_item  WITH CHECK ADD  constraint fk_priceList_item_item FOREIGN key(itemId)
+REFERENCES item (itemId)
+go
+ALTER table priceList_item CHECK constraint fk_priceList_item_item
+go
+ALTER table priceList_item  WITH CHECK ADD  constraint fk_priceList_item_priceList FOREIGN key(priceListId)
+REFERENCES priceList (priceListId)
+go
+ALTER table priceList_item CHECK constraint fk_priceList_item_priceList
+go
+ALTER table tax_item  WITH CHECK ADD  constraint fk_tax_item_item FOREIGN key(itemId)
+REFERENCES item (itemId)
+go
+ALTER table tax_item CHECK constraint fk_tax_item_item
+go
+ALTER table tax_item  WITH CHECK ADD  constraint fk_tax_item_tax FOREIGN key(taxId)
+REFERENCES tax (taxId)
+go
+ALTER table tax_item CHECK constraint fk_tax_item_tax
+go
+ALTER table user  WITH CHECK ADD  constraint fk_user_roll FOREIGN key(rollId)
+REFERENCES roll (rollId)
+go
+ALTER table user CHECK constraint fk_user_roll
+go
+ALTER table warehouse  WITH CHECK ADD  constraint fk_warehouse_branch FOREIGN key(branchId)
+REFERENCES branch (branchId)
+go
+ALTER table warehouse CHECK constraint fk_warehouse_branch
+go
+ALTER table warehouse_item  WITH CHECK ADD  constraint fk_warehouse_item_item FOREIGN key(itemId)
+REFERENCES item (itemId)
+go
+ALTER table warehouse_item CHECK constraint fk_warehouse_item_item
+go
+ALTER table warehouse_item  WITH CHECK ADD  constraint fk_warehouse_item_warehouse FOREIGN key(warehouseId)
+REFERENCES warehouse (warehouseId)
+go
+ALTER table warehouse_item CHECK constraint fk_warehouse_item_warehouse
+go
 
 
 
